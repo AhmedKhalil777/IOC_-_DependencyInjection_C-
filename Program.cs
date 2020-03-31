@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using IOC_and_DependencyInjection_C_Sharp.Data;
 using IOC_and_DependencyInjection_C_Sharp.DependencyInjection;
 using IOC_and_DependencyInjection_C_Sharp.Services;
 namespace IOC_and_DependencyInjection_C_Sharp
@@ -11,7 +12,7 @@ namespace IOC_and_DependencyInjection_C_Sharp
             var services =  new DIServiceCollection();
             //services.RegisterSingleton<RandomGuidGenerator>();
             services.RegisterTransient<IFoodService , LunchService>();
-
+            services.RegisterTransient<IRandomFoodGenerator, RandomFoodGenerator>();
             var container = services.GenerateContainer();
             var serviceFirst = container.GetService<IFoodService>();
             var serviceSecond = container.GetService<IFoodService>();

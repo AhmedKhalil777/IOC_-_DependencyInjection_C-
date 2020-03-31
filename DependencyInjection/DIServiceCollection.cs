@@ -23,8 +23,11 @@ namespace IOC_and_DependencyInjection_C_Sharp.DependencyInjection
             _ServiceDescriptors.Add(new ServieceDescriptor(typeof(T), ServiceLifeTime.Transient));
         }
 
-        
-        public void RegisterTransient<TService , TImplementation>()
+        public void RegisterSingleton<TService , TImplementation>() where TImplementation : TService
+        {
+            _ServiceDescriptors.Add(new ServieceDescriptor(typeof(TService),typeof(TImplementation) ,ServiceLifeTime.Singleton));
+        }   
+        public void RegisterTransient<TService , TImplementation>() where TImplementation : TService
         {
             _ServiceDescriptors.Add(new ServieceDescriptor(typeof(TService),typeof(TImplementation) ,ServiceLifeTime.Transient));
         }

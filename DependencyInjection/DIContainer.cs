@@ -10,22 +10,31 @@ namespace IOC_and_DependencyInjection_C_Sharp.DependencyInjection
         {
             servieceDescriptors = _servieceDescriptors;
         }
-        public T GetService<T>()
+
+        public object GetService(Type serviceType)
         {
-            var descriptor = servieceDescriptors.SingleOrDefault(x=>x.ServiceType == typeof(T));
+            var descriptor = servieceDescriptors.SingleOrDefault(x=>x.ServiceType == serviceType);
             
             if (descriptor == null)
             {
-                throw new Exception($"Service with the name of {typeof(T).Name} is not registered"); 
+                throw new Exception($"Service with the name of {serviceType.Name} is not registered"); 
             }
             if (descriptor.Implementation != null)
             {
-                return (T)descriptor.Implementation;
+                return descriptor.Implementation;
+            }
+            var actualtype = descriptor.ImplementationType ?? descriptor.ServiceType;
+             
+            if (actualtype.IsAbstract || actualtype.IsInterface )
+            {
+                throw new Exception($" Can't istentiate the abstract or interfaces {actualtype}");
             }
 
+            var constructorInfo =  actualtype.GetConstructors().First();
+            var parameters = constructorInfo.GetParameters().Select(x=>GetService(x.ParameterType))
+                .ToArray();
 
-
-            var implementation = (T) Activator.CreateInstance(descriptor.ImplementationType);
+            var implementation =  Activator.CreateInstance(actualtype , parameters);
 
             if (descriptor.LifeTime == ServiceLifeTime.Singleton)
             {
@@ -33,6 +42,10 @@ namespace IOC_and_DependencyInjection_C_Sharp.DependencyInjection
             }
             
             return  implementation;
+        }
+        public T GetService<T>()
+        {
+            return (T)GetService(typeof(T));
         }
     }
 }
